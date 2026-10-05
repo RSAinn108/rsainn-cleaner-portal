@@ -1723,7 +1723,7 @@ for(const file of files){
     const storagePath = `${id}/${unique}.${extension}`;
 
     const {error:uploadError} = await db.storage
-        .from("cleaning-proof")
+        .from("cleaning proof")
         .upload(storagePath,file,{
             cacheControl:"3600",
             upsert:false,
@@ -1733,7 +1733,7 @@ for(const file of files){
     if(uploadError) throw uploadError;
 
     const {data:urlData} = db.storage
-        .from("cleaning-proof")
+        .from("cleaning proof")
         .getPublicUrl(storagePath);
 
     const {error:rowError} = await db
@@ -1745,7 +1745,7 @@ for(const file of files){
         });
 
     if(rowError){
-        await db.storage.from("cleaning-proof").remove([storagePath]);
+        await db.storage.from("cleaning proof").remove([storagePath]);
         throw rowError;
     }
 }
@@ -1769,7 +1769,7 @@ async function deleteCleaningPhoto(bookingId,photoId,storagePath){
 if(!confirm("Delete this cleaning proof photo?")) return;
 
 const {error:storageError} = await db.storage
-.from("cleaning-proof")
+.from("cleaning proof")
 .remove([storagePath]);
 
 if(storageError){
