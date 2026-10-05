@@ -1,0 +1,2142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>RSAinn Cleaner Portal</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f7f6;
+    color: #1e293b;
+}
+
+header {
+    background: linear-gradient(135deg,#064e3b,#0f766e);
+    color: white;
+    padding: 26px 20px;
+}
+
+.header-inner {
+    max-width: 1100px;
+    margin: auto;
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.subtitle {
+    margin-top: 5px;
+    opacity: .9;
+}
+
+.container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 20px;
+}
+
+.status-bar {
+    background: white;
+    border-radius: 14px;
+    padding: 14px 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 3px 12px rgba(0,0,0,.06);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+}
+
+.online {
+    color:#15803d;
+    font-weight:700;
+}
+
+.error {
+    color:#b91c1c;
+    font-weight:700;
+}
+
+.calendar {
+    background:white;
+    border-radius:16px;
+    padding:18px;
+    box-shadow:0 3px 15px rgba(0,0,0,.07);
+    margin-bottom:25px;
+}
+
+.calendar-header {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:15px;
+}
+
+.calendar-header button {
+    border:none;
+    background:#0f766e;
+    color:white;
+    border-radius:9px;
+    padding:10px 15px;
+    cursor:pointer;
+    font-size:18px;
+}
+
+.calendar-grid {
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:6px;
+}
+
+.day-name {
+    font-weight:bold;
+    text-align:center;
+    padding:8px;
+    font-size:13px;
+}
+
+.day {
+    min-height:105px;
+    border:1px solid #e2e8f0;
+    border-radius:10px;
+    padding:7px;
+    background:#fff;
+}
+
+.day-number {
+    font-weight:bold;
+    margin-bottom:5px;
+}
+
+/* CHECK-IN */
+
+.checkin-label {
+    font-size:10px;
+    margin-top:4px;
+    padding:5px;
+    border-radius:5px;
+    background:#2563eb;
+    color:white;
+    font-weight:bold;
+}
+
+/* CHECK-OUT */
+
+.checkout-label {
+    font-size:10px;
+    margin-top:4px;
+    padding:5px;
+    border-radius:5px;
+    background:#047857;
+    color:white;
+    font-weight:bold;
+}
+
+/* SAME DAY TURNOVER */
+
+.turnover-day {
+    background:#fff7ed;
+    border:2px solid #f97316;
+}
+
+.turnover-label {
+    font-size:10px;
+    margin-top:4px;
+    padding:5px;
+    border-radius:5px;
+    background:#ea580c;
+    color:white;
+    font-weight:bold;
+}
+
+.cleaning-day {
+    cursor:pointer;
+}
+
+.jobs {
+    display:grid;
+    gap:15px;
+}
+
+.job-card {
+    background:white;
+    border-radius:16px;
+    padding:18px;
+    box-shadow:0 3px 14px rgba(0,0,0,.07);
+}
+
+.job-top {
+    display:flex;
+    justify-content:space-between;
+    gap:15px;
+}
+
+.property {
+    font-size:19px;
+    font-weight:800;
+}
+
+.date {
+    margin-top:6px;
+    color:#64748b;
+    line-height:1.6;
+}
+
+.badge {
+    padding:7px 10px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:bold;
+    height:fit-content;
+}
+
+.pending {
+    background:#fef3c7;
+    color:#92400e;
+}
+
+.progress {
+    background:#dbeafe;
+    color:#1d4ed8;
+}
+
+.completed {
+    background:#dcfce7;
+    color:#166534;
+}
+
+.job-actions {
+    margin-top:15px;
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+button.action {
+    border:none;
+    padding:10px 14px;
+    border-radius:9px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.primary {
+    background:#0f766e;
+    color:white;
+}
+
+.secondary {
+    background:#e2e8f0;
+    color:#334155;
+}
+
+.complete-btn {
+    background:#16a34a;
+    color:white;
+}
+
+.checklist {
+    margin-top:18px;
+    display:none;
+    border-top:1px solid #e2e8f0;
+    padding-top:18px;
+}
+
+.room {
+    margin-bottom:22px;
+}
+
+.reference-images {
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+    margin:12px 0;
+}
+
+.reference-images img {
+    width:100%;
+    height:190px;
+    object-fit:cover;
+    border-radius:10px;
+    background:#e2e8f0;
+}
+
+.check-item {
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+    margin:9px 0;
+}
+
+.check-item input {
+    width:19px;
+    height:19px;
+}
+
+.photo-proof {
+    margin-top:24px; padding:16px; border:1px solid #dbe4e8;
+    border-radius:12px; background:#f8fafc;
+}
+.photo-proof p { margin:6px 0 12px; color:#64748b; font-size:14px; }
+.photo-upload-label {
+    display:inline-block; background:#0f766e; color:white; padding:10px 14px;
+    border-radius:9px; font-weight:bold; cursor:pointer;
+}
+.photo-upload-label input { display:none; }
+.photo-status { margin-top:10px; font-size:13px; color:#475569; }
+.photo-grid {
+    display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:14px;
+}
+.proof-photo { position:relative; border-radius:10px; overflow:hidden; background:#e2e8f0; }
+.proof-photo img { width:100%; height:150px; object-fit:cover; display:block; }
+.delete-photo {
+    position:absolute; top:7px; right:7px; border:none; border-radius:20px;
+    width:30px; height:30px; cursor:pointer; background:rgba(15,23,42,.82);
+    color:white; font-weight:bold;
+}
+@media(max-width:700px) { .photo-grid { grid-template-columns:repeat(2,1fr); } }
+
+textarea {
+    width:100%;
+    min-height:90px;
+    padding:12px;
+    border-radius:10px;
+    border:1px solid #cbd5e1;
+}
+
+.empty,
+.loading {
+    text-align:center;
+    padding:30px;
+}
+
+.legend {
+    display:flex;
+    gap:15px;
+    flex-wrap:wrap;
+    margin-top:15px;
+    font-size:12px;
+}
+
+.legend-item {
+    display:flex;
+    align-items:center;
+    gap:5px;
+}
+
+.legend-colour {
+    width:13px;
+    height:13px;
+    border-radius:3px;
+}
+
+.legend-checkin {
+    background:#2563eb;
+}
+
+.legend-clean {
+    background:#047857;
+}
+
+.legend-turnover {
+    background:#ea580c;
+}
+
+@media(max-width:700px) {
+
+    .container {
+        padding:12px;
+    }
+
+    .day {
+        min-height:85px;
+        padding:4px;
+        font-size:11px;
+    }
+
+    .checkin-label,
+    .checkout-label,
+    .turnover-label {
+        font-size:8px;
+        padding:4px 2px;
+    }
+
+    .reference-images {
+        grid-template-columns:1fr;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="header-inner">
+
+<div class="logo">
+RSAinn
+</div>
+
+<div class="subtitle">
+Driftsands 108 • Cleaner Portal
+</div>
+
+</div>
+</header>
+
+
+<div class="container">
+
+<div class="status-bar">
+
+<span id="connectionStatus">
+Connecting to Supabase...
+</span>
+
+<span id="bookingCount"></span>
+
+</div>
+
+
+<div class="calendar">
+
+<div class="calendar-header">
+
+<button onclick="previousMonth()">
+‹
+</button>
+
+<h2 id="monthTitle"></h2>
+
+<button onclick="nextMonth()">
+›
+</button>
+
+</div>
+
+
+<div
+class="calendar-grid"
+id="calendar">
+</div>
+
+
+<div class="legend">
+
+<div class="legend-item">
+<span class="legend-colour legend-checkin"></span>
+Check-in
+</div>
+
+<div class="legend-item">
+<span class="legend-colour legend-clean"></span>
+Check-out / Clean
+</div>
+
+<div class="legend-item">
+<span class="legend-colour legend-turnover"></span>
+Same-day turnover
+</div>
+
+</div>
+
+</div>
+
+
+<h2>
+Cleaning Schedule
+</h2>
+
+
+<div id="jobs">
+
+<div class="loading">
+Loading bookings...
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* ==========================================
+   SUPABASE
+========================================== */
+
+const SUPABASE_URL =
+"https://bxjenexozkxqroidjvdw.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_DGBXvfm1oJsje6rLO3veug_2Yn7uRx0";
+
+const db =
+window.supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+
+
+/* ==========================================
+   IMAGE STORAGE
+========================================== */
+
+const IMAGE_BASE =
+"https://bxjenexozkxqroidjvdw.supabase.co/storage/v1/object/public/cleaning-staging/";
+
+
+const stagingImages = {
+
+kitchen:[
+IMAGE_BASE+"kitchen.jpg",
+IMAGE_BASE+"kitchen-2.jpg"
+],
+
+coffee:[
+IMAGE_BASE+"coffee-station.jpg"
+],
+
+lounge:[
+IMAGE_BASE+"lounge.jpg",
+IMAGE_BASE+"lounge-view.jpg"
+],
+
+mainBedroom:[
+IMAGE_BASE+"main-bedroom.jpg"
+],
+
+secondBedroom:[
+IMAGE_BASE+"second-bedroom.jpg",
+IMAGE_BASE+"second-bedroom-2.jpg"
+],
+
+ensuite:[
+IMAGE_BASE+"ensuite.jpg",
+IMAGE_BASE+"ensuite-2.jpg"
+],
+
+bathroom:[
+IMAGE_BASE+"main-bathroom.jpg",
+IMAGE_BASE+"main-bathroom-2.jpg"
+],
+
+balcony:[
+IMAGE_BASE+"balcony.jpg"
+]
+
+};
+
+
+/* ==========================================
+   DATA
+========================================== */
+
+let bookings = [];
+
+let currentDate =
+new Date();
+
+
+/* ==========================================
+   LOAD BOOKINGS
+========================================== */
+
+async function loadBookings(){
+
+const status =
+document.getElementById(
+"connectionStatus"
+);
+
+try {
+
+const {data,error} =
+await db
+.from("bookings")
+.select("*")
+.order(
+"check_in",
+{ascending:true}
+);
+
+if(error)
+throw error;
+
+bookings =
+data || [];
+
+status.innerHTML =
+"● Connected to Supabase";
+
+status.className =
+"online";
+
+document.getElementById(
+"bookingCount"
+).textContent =
+bookings.length +
+" bookings synced";
+
+renderCalendar();
+
+renderJobs();
+
+}
+
+catch(error){
+
+console.error(error);
+
+status.innerHTML =
+"Unable to connect to bookings";
+
+status.className =
+"error";
+
+}
+
+}
+
+
+/* ==========================================
+   CALENDAR
+========================================== */
+
+function renderCalendar(){
+
+const calendar =
+document.getElementById(
+"calendar"
+);
+
+calendar.innerHTML="";
+
+const year =
+currentDate.getFullYear();
+
+const month =
+currentDate.getMonth();
+
+
+document.getElementById(
+"monthTitle"
+).textContent =
+currentDate.toLocaleDateString(
+"en-ZA",
+{
+month:"long",
+year:"numeric"
+}
+);
+
+
+/* DAY HEADINGS */
+
+const days =
+[
+"Sun",
+"Mon",
+"Tue",
+"Wed",
+"Thu",
+"Fri",
+"Sat"
+];
+
+days.forEach(day=>{
+
+const element =
+document.createElement("div");
+
+element.className =
+"day-name";
+
+element.textContent =
+day;
+
+calendar.appendChild(
+element
+);
+
+});
+
+
+const firstDay =
+new Date(
+year,
+month,
+1
+).getDay();
+
+
+const daysInMonth =
+new Date(
+year,
+month+1,
+0
+).getDate();
+
+
+/* BLANK CELLS */
+
+for(
+let i=0;
+i<firstDay;
+i++
+){
+
+calendar.appendChild(
+document.createElement("div")
+);
+
+}
+
+
+/* CALENDAR DAYS */
+
+for(
+let day=1;
+day<=daysInMonth;
+day++
+){
+
+const cell =
+document.createElement(
+"div"
+);
+
+cell.className =
+"day";
+
+cell.innerHTML =
+`<div class="day-number">${day}</div>`;
+
+
+/* BOOKINGS STARTING TODAY */
+
+const arrivals =
+bookings.filter(
+booking => {
+
+const date =
+parseDate(
+booking.check_in
+);
+
+return (
+date.getFullYear()===year &&
+date.getMonth()===month &&
+date.getDate()===day
+);
+
+}
+);
+
+
+/* BOOKINGS ENDING TODAY */
+
+const departures =
+bookings.filter(
+booking => {
+
+const date =
+parseDate(
+booking.check_out
+);
+
+return (
+date.getFullYear()===year &&
+date.getMonth()===month &&
+date.getDate()===day
+);
+
+}
+);
+
+
+/* SAME DAY TURNOVER */
+
+const turnover =
+arrivals.length > 0 &&
+departures.length > 0;
+
+
+/* TURNOVER */
+
+if(turnover){
+
+cell.classList.add(
+"turnover-day",
+"cleaning-day"
+);
+
+const label =
+document.createElement(
+"div"
+);
+
+label.className =
+"turnover-label";
+
+label.textContent =
+"🔄 TURNOVER CLEAN";
+
+cell.appendChild(
+label
+);
+
+}
+
+
+/* NORMAL DEPARTURE */
+
+if(
+departures.length &&
+!turnover
+){
+
+cell.classList.add(
+"cleaning-day"
+);
+
+const label =
+document.createElement(
+"div"
+);
+
+label.className =
+"checkout-label";
+
+label.textContent =
+"🧹 CHECK-OUT / CLEAN";
+
+cell.appendChild(
+label
+);
+
+}
+
+
+/* NORMAL ARRIVAL */
+
+if(
+arrivals.length &&
+!turnover
+){
+
+const label =
+document.createElement(
+"div"
+);
+
+label.className =
+"checkin-label";
+
+label.textContent =
+"🔑 CHECK-IN";
+
+cell.appendChild(
+label
+);
+
+}
+
+
+/* TURNOVER DETAILS */
+
+if(turnover){
+
+const checkout =
+document.createElement(
+"div"
+);
+
+checkout.className =
+"checkout-label";
+
+checkout.textContent =
+"Guest out";
+
+cell.appendChild(
+checkout
+);
+
+
+const checkin =
+document.createElement(
+"div"
+);
+
+checkin.className =
+"checkin-label";
+
+checkin.textContent =
+"New guest in";
+
+cell.appendChild(
+checkin
+);
+
+}
+
+
+/* CLICK CLEANING DAY */
+
+if(departures.length){
+
+cell.onclick =
+()=>{
+
+const booking =
+departures[0];
+
+const card =
+document.getElementById(
+"job-"+booking.id
+);
+
+if(card){
+
+card.scrollIntoView({
+behavior:"smooth",
+block:"center"
+});
+
+}
+
+};
+
+}
+
+
+calendar.appendChild(
+cell
+);
+
+}
+
+}
+
+
+/* ==========================================
+   MONTH BUTTONS
+========================================== */
+
+function previousMonth(){
+
+currentDate =
+new Date(
+currentDate.getFullYear(),
+currentDate.getMonth()-1,
+1
+);
+
+renderCalendar();
+
+}
+
+
+function nextMonth(){
+
+currentDate =
+new Date(
+currentDate.getFullYear(),
+currentDate.getMonth()+1,
+1
+);
+
+renderCalendar();
+
+}
+
+
+/* ==========================================
+   CLEANING SCHEDULE
+========================================== */
+
+function renderJobs(){
+
+const jobs =
+document.getElementById(
+"jobs"
+);
+
+jobs.innerHTML="";
+
+
+const today =
+new Date();
+
+today.setHours(
+0,0,0,0
+);
+
+
+const futureBookings =
+bookings.filter(
+booking =>
+parseDate(
+booking.check_out
+) >= today
+);
+
+
+if(
+!futureBookings.length
+){
+
+jobs.innerHTML =
+`
+<div class="empty">
+No upcoming cleaning jobs.
+</div>
+`;
+
+return;
+
+}
+
+
+const wrapper =
+document.createElement(
+"div"
+);
+
+wrapper.className =
+"jobs";
+
+
+futureBookings.forEach(
+booking=>{
+
+wrapper.appendChild(
+createJobCard(
+booking
+)
+);
+
+}
+);
+
+
+jobs.appendChild(
+wrapper
+);
+
+}
+
+
+/* ==========================================
+   JOB CARD
+========================================== */
+
+function createJobCard(
+booking
+){
+
+const card =
+document.createElement(
+"div"
+);
+
+card.className =
+"job-card";
+
+card.id =
+"job-"+booking.id;
+
+
+const status =
+booking.cleaning_status ||
+"pending";
+
+
+const sameDayArrival =
+bookings.some(
+other =>
+other.id !== booking.id &&
+other.check_in ===
+booking.check_out
+);
+
+
+const turnoverText =
+sameDayArrival
+?
+`
+<br>
+<strong style="color:#ea580c">
+🔄 SAME-DAY TURNOVER
+</strong>
+`
+:
+"";
+
+
+card.innerHTML =
+`
+
+<div class="job-top">
+
+<div>
+
+<div class="property">
+Driftsands 108
+</div>
+
+<div class="date">
+
+🧹 Cleaning:
+<strong>
+${formatDate(
+booking.check_out
+)}
+</strong>
+
+${turnoverText}
+
+<br>
+
+Guest stay:
+${formatDate(
+booking.check_in
+)}
+
+→
+
+${formatDate(
+booking.check_out
+)}
+
+<div
+id="completed-time-${booking.id}"
+style="margin-top:8px;${status === "completed" && booking.cleaning_completed_at ? "" : "display:none;"}"
+>
+${status === "completed" && booking.cleaning_completed_at
+? `✅ Cleaning Completed<br><strong>${formatDateTime(booking.cleaning_completed_at)}</strong>`
+: ""}
+</div>
+
+</div>
+
+</div>
+
+
+<span
+id="status-${booking.id}"
+class="badge ${statusClass(status)}">
+
+${prettyStatus(status)}
+
+</span>
+
+</div>
+
+
+<div class="job-actions">
+
+<button
+class="action primary"
+onclick="startCleaning(${booking.id})">
+
+Start Cleaning
+
+</button>
+
+
+<button
+class="action secondary"
+onclick="toggleChecklist(${booking.id})">
+
+Open Checklist
+
+</button>
+
+</div>
+
+
+<div
+class="checklist"
+id="checklist-${booking.id}">
+
+
+${roomSection(
+booking.id,
+"Kitchen",
+stagingImages.kitchen,
+[
+"Clean all counters and surfaces",
+"Clean sink and taps",
+"Clean stove and oven exterior",
+"Check fridge",
+"Empty bins",
+"Replace bin liner",
+"Wash and pack dishes",
+"Stage kitchen as shown"
+]
+)}
+
+
+${roomSection(
+booking.id,
+"Coffee Station",
+stagingImages.coffee,
+[
+"Clean coffee station",
+"Restock complimentary coffee",
+"Restock tea",
+"Restock sugar",
+"Check cups and teaspoons",
+"Stage as shown"
+]
+)}
+
+
+${roomSection(
+booking.id,
+"Lounge",
+stagingImages.lounge,
+[
+"Vacuum and clean floors",
+"Clean surfaces",
+"Arrange couches",
+"Arrange cushions",
+"Check TV area",
+"Check air conditioner",
+"Stage lounge as shown"
+]
+)}
+
+
+${roomSection(
+booking.id,
+"Main Bedroom",
+stagingImages.mainBedroom,
+[
+"Replace linen",
+"Make bed",
+"Clean bedside areas",
+"Clean floors",
+"Check cupboards",
+"Stage bedroom as shown"
+]
+)}
+
+
+${roomSection(
+booking.id,
+"Second Bedroom",
+stagingImages.secondBedroom,
+[
+"Replace linen",
+"Make both single beds",
+"Clean surfaces",
+"Clean floors",
+"Stage bedroom as shown"
+]
+)}
+
+
+${roomSection(
+booking.id,
+"En-suite Bathroom",
+stagingImages.ensuite,
+[
+"Clean shower",
+"Clean toilet",
+"Clean basin and taps",
+"Clean mirror",
+"Replace towels",
+"Check toilet paper",
+"Stage bathroom as shown"
+]
+)}
+
+
+${roomSection(
+booking.id,
+"Main Bathroom",
+stagingImages.bathroom,
+[
+"Clean bath",
+"Clean toilet",
+"Clean basin and taps",
+"Clean mirror",
+"Replace towels",
+"Check toilet paper",
+"Stage bathroom as shown"
+]
+)}
+
+
+${roomSection(
+booking.id,
+"Balcony",
+stagingImages.balcony,
+[
+"Sweep and clean balcony",
+"Clean furniture",
+"Check Weber gas braai",
+"Arrange furniture",
+"Stage balcony as shown"
+]
+)}
+
+
+<div class="photo-proof">
+<h3>📸 Cleaning Photo Proof</h3>
+<p>Upload at least one final photo before completing this cleaning.</p>
+
+<label class="photo-upload-label">
+📷 Take / Upload Photo
+<input type="file" accept="image/*" capture="environment" multiple
+onchange="uploadCleaningPhotos(${booking.id}, this)">
+</label>
+
+<div class="photo-status" id="photo-status-${booking.id}"></div>
+<div class="photo-grid" id="photo-grid-${booking.id}"></div>
+</div>
+
+<h3>
+Cleaner Notes
+</h3>
+
+
+<textarea
+id="notes-${booking.id}"
+placeholder="Report damage, missing items, maintenance problems or anything the manager should know..."
+>${escapeHTML(
+booking.cleaner_notes || ""
+)}</textarea>
+
+
+<div class="job-actions">
+
+<button
+class="action secondary"
+onclick="saveNotes(${booking.id})">
+
+Save Notes
+
+</button>
+
+
+<button
+class="action complete-btn"
+onclick="completeCleaning(${booking.id})">
+
+✓ Complete Cleaning
+
+</button>
+
+</div>
+
+</div>
+
+`;
+
+return card;
+
+}
+
+
+/* ==========================================
+   ROOM CHECKLIST
+========================================== */
+
+function roomSection(
+bookingId,
+title,
+images,
+items
+){
+
+let imageHTML="";
+
+images.forEach(
+src=>{
+
+imageHTML +=
+`
+<img
+src="${src}"
+alt="${title}"
+loading="lazy"
+onerror="this.style.display='none'">
+`;
+
+}
+);
+
+
+let checklistHTML="";
+
+items.forEach(
+(item,index)=>{
+
+const itemKey = `${slugify(title)}-${index}`;
+
+checklistHTML +=
+`
+
+<label class="check-item">
+
+<input
+type="checkbox"
+data-booking="${bookingId}"
+data-item-key="${itemKey}"
+onchange="saveChecklistItem(${bookingId}, '${itemKey}', this)">
+
+<span>
+${item}
+</span>
+
+</label>
+
+`;
+
+}
+);
+
+
+return `
+<div class="room">
+
+<h3>
+${title}
+</h3>
+
+<div class="reference-images">
+${imageHTML}
+</div>
+
+${checklistHTML}
+
+</div>
+`;
+
+}
+
+
+/* ==========================================
+   OPEN CHECKLIST
+========================================== */
+
+async function toggleChecklist(
+id
+){
+
+const checklist =
+document.getElementById(
+"checklist-"+id
+);
+
+const opening = checklist.style.display !== "block";
+
+checklist.style.display = opening ? "block" : "none";
+
+if(opening){
+    await loadChecklistState(id);
+    await loadCleaningPhotos(id);
+}
+
+}
+
+
+
+
+/* ==========================================
+   CHECKLIST SUPABASE PERSISTENCE
+========================================== */
+
+function slugify(value){
+return String(value)
+.toLowerCase()
+.trim()
+.replace(/[^a-z0-9]+/g,"-")
+.replace(/^-+|-+$/g,"");
+}
+
+async function loadChecklistState(bookingId){
+
+const {data,error} = await db
+.from("cleaning_checklist")
+.select("item_key,completed")
+.eq("booking_id",bookingId);
+
+if(error){
+console.error("Could not load checklist:",error);
+return;
+}
+
+const saved = new Map(
+(data || []).map(row => [row.item_key, row.completed])
+);
+
+document.querySelectorAll(
+`input[data-booking="${bookingId}"][data-item-key]`
+).forEach(box => {
+box.checked = saved.get(box.dataset.itemKey) === true;
+});
+
+}
+
+async function saveChecklistItem(bookingId,itemKey,checkbox){
+
+const wasChecked = checkbox.checked;
+checkbox.disabled = true;
+
+const now = new Date().toISOString();
+
+const {error} = await db
+.from("cleaning_checklist")
+.upsert({
+booking_id: bookingId,
+item_key: itemKey,
+completed: wasChecked,
+completed_at: wasChecked ? now : null,
+updated_at: now
+},{
+onConflict:"booking_id,item_key"
+});
+
+checkbox.disabled = false;
+
+if(error){
+console.error("Could not save checklist item:",error);
+checkbox.checked = !wasChecked;
+alert("Could not save this checklist item. Please try again.");
+}
+
+}
+
+
+/* ==========================================
+   START CLEANING
+========================================== */
+
+async function startCleaning(
+id
+){
+
+const {error} =
+await db
+.from("bookings")
+.update({
+cleaning_status:
+"in_progress"
+})
+.eq(
+"id",
+id
+);
+
+
+if(error){
+
+alert(
+"Could not update cleaning status."
+);
+
+console.error(
+error
+);
+
+return;
+
+}
+
+
+updateLocalStatus(
+id,
+"in_progress"
+);
+
+
+document.getElementById(
+"checklist-"+id
+).style.display =
+"block";
+
+await loadChecklistState(id);
+await loadCleaningPhotos(id);
+
+}
+
+
+/* ==========================================
+   SAVE NOTES
+========================================== */
+
+async function saveNotes(
+id
+){
+
+const notes =
+document.getElementById(
+"notes-"+id
+).value;
+
+
+const {error} =
+await db
+.from("bookings")
+.update({
+cleaner_notes:
+notes
+})
+.eq(
+"id",
+id
+);
+
+
+if(error){
+
+alert(
+"Could not save notes."
+);
+
+return;
+
+}
+
+
+const booking =
+bookings.find(
+b=>b.id===id
+);
+
+if(booking){
+
+booking.cleaner_notes =
+notes;
+
+}
+
+
+alert(
+"Notes saved."
+);
+
+}
+
+
+/* ==========================================
+   CLEANING PHOTO PROOF
+========================================== */
+
+async function loadCleaningPhotos(id){
+
+const grid = document.getElementById("photo-grid-"+id);
+const status = document.getElementById("photo-status-"+id);
+
+if(!grid) return;
+
+status.textContent = "Loading photos...";
+
+const {data,error} = await db
+.from("cleaning_photos")
+.select("*")
+.eq("booking_id",id)
+.order("created_at",{ascending:true});
+
+if(error){
+    console.error(error);
+    status.textContent = "Could not load cleaning photos.";
+    return;
+}
+
+grid.innerHTML = "";
+
+if(!data || !data.length){
+    status.textContent = "No proof photos uploaded yet.";
+    return;
+}
+
+status.textContent = `${data.length} proof photo${data.length===1 ? "" : "s"} uploaded`;
+
+data.forEach(photo=>{
+    const wrapper = document.createElement("div");
+    wrapper.className = "proof-photo";
+
+    const img = document.createElement("img");
+    img.src = photo.photo_url;
+    img.alt = "Cleaning proof photo";
+    img.loading = "lazy";
+
+    const button = document.createElement("button");
+    button.className = "delete-photo";
+    button.type = "button";
+    button.textContent = "×";
+    button.title = "Delete photo";
+    button.onclick = ()=>deleteCleaningPhoto(id,photo.id,photo.storage_path);
+
+    wrapper.appendChild(img);
+    wrapper.appendChild(button);
+    grid.appendChild(wrapper);
+});
+
+}
+
+
+async function uploadCleaningPhotos(id,input){
+
+const files = Array.from(input.files || []);
+if(!files.length) return;
+
+const status = document.getElementById("photo-status-"+id);
+status.textContent = `Uploading ${files.length} photo${files.length===1 ? "" : "s"}...`;
+input.disabled = true;
+
+try {
+
+for(const file of files){
+
+    if(!file.type || !file.type.startsWith("image/")){
+        throw new Error("Only image files can be uploaded.");
+    }
+
+    const extension = (file.name.split(".").pop() || "jpg")
+        .toLowerCase().replace(/[^a-z0-9]/g,"") || "jpg";
+
+    const unique = (window.crypto && crypto.randomUUID)
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+    const storagePath = `${id}/${unique}.${extension}`;
+
+    const {error:uploadError} = await db.storage
+        .from("cleaning-proof")
+        .upload(storagePath,file,{
+            cacheControl:"3600",
+            upsert:false,
+            contentType:file.type
+        });
+
+    if(uploadError) throw uploadError;
+
+    const {data:urlData} = db.storage
+        .from("cleaning-proof")
+        .getPublicUrl(storagePath);
+
+    const {error:rowError} = await db
+        .from("cleaning_photos")
+        .insert({
+            booking_id:id,
+            photo_url:urlData.publicUrl,
+            storage_path:storagePath
+        });
+
+    if(rowError){
+        await db.storage.from("cleaning-proof").remove([storagePath]);
+        throw rowError;
+    }
+}
+
+input.value = "";
+await loadCleaningPhotos(id);
+
+} catch(error) {
+    console.error(error);
+    status.textContent = "Photo upload failed.";
+    alert("Could not upload the cleaning photo. Please try again.");
+} finally {
+    input.disabled = false;
+}
+
+}
+
+
+async function deleteCleaningPhoto(bookingId,photoId,storagePath){
+
+if(!confirm("Delete this cleaning proof photo?")) return;
+
+const {error:storageError} = await db.storage
+.from("cleaning-proof")
+.remove([storagePath]);
+
+if(storageError){
+    console.error(storageError);
+    alert("Could not delete the photo from storage.");
+    return;
+}
+
+const {error:rowError} = await db
+.from("cleaning_photos")
+.delete()
+.eq("id",photoId);
+
+if(rowError){
+    console.error(rowError);
+    alert("The photo was removed from storage, but its database record could not be deleted.");
+}
+
+await loadCleaningPhotos(bookingId);
+
+}
+
+
+async function getCleaningPhotoCount(id){
+
+const {count,error} = await db
+.from("cleaning_photos")
+.select("id",{count:"exact",head:true})
+.eq("booking_id",id);
+
+if(error) throw error;
+
+return count || 0;
+
+}
+
+
+/* ==========================================
+   COMPLETE CLEANING
+========================================== */
+
+async function completeCleaning(
+id
+){
+
+const checkboxes =
+document.querySelectorAll(
+`input[data-booking="${id}"]`
+);
+
+const incomplete =
+Array.from(
+checkboxes
+).filter(
+box=>!box.checked
+);
+
+if(incomplete.length){
+
+alert(
+`Please complete all checklist items before completing this cleaning.\n\n${incomplete.length} item(s) still need to be ticked.`
+);
+
+return;
+
+}
+
+let photoCount;
+
+try {
+    photoCount = await getCleaningPhotoCount(id);
+} catch(error) {
+    console.error(error);
+    alert("Could not verify cleaning photos. Please try again.");
+    return;
+}
+
+if(photoCount < 1){
+    alert("Please upload at least one cleaning proof photo before completing this cleaning.");
+    return;
+}
+
+const notes =
+document.getElementById(
+"notes-"+id
+).value;
+
+const completedAt =
+new Date().toISOString();
+
+const {error} =
+await db
+.from("bookings")
+.update({
+
+cleaning_status:
+"completed",
+
+cleaner_notes:
+notes,
+
+cleaning_completed_at:
+completedAt
+
+})
+.eq(
+"id",
+id
+);
+
+if(error){
+
+alert(
+"Could not complete cleaning."
+);
+
+console.error(error);
+
+return;
+
+}
+
+const booking =
+bookings.find(
+b=>b.id===id
+);
+
+if(booking){
+
+booking.cleaner_notes =
+notes;
+
+booking.cleaning_completed_at =
+completedAt;
+
+}
+
+updateLocalStatus(
+id,
+"completed"
+);
+
+showCompletionTime(
+id,
+completedAt
+);
+
+alert(
+"Cleaning completed successfully."
+);
+
+}
+
+
+/* ==========================================
+   STATUS
+========================================== */
+
+function updateLocalStatus(
+id,
+status
+){
+
+const booking =
+bookings.find(
+b=>b.id===id
+);
+
+if(booking){
+
+booking.cleaning_status =
+status;
+
+}
+
+
+const badge =
+document.getElementById(
+"status-"+id
+);
+
+
+if(badge){
+
+badge.className =
+"badge "+
+statusClass(
+status
+);
+
+badge.textContent =
+prettyStatus(
+status
+);
+
+}
+
+}
+
+
+/* ==========================================
+   DATE FUNCTIONS
+========================================== */
+
+function parseDate(
+value
+){
+
+return new Date(
+value+"T00:00:00"
+);
+
+}
+
+
+function formatDate(
+value
+){
+
+if(!value)
+return "—";
+
+return parseDate(
+value
+).toLocaleDateString(
+"en-ZA",
+{
+day:"numeric",
+month:"short",
+year:"numeric"
+}
+);
+
+}
+
+
+function formatDateTime(
+value
+){
+
+if(!value)
+return "—";
+
+return new Date(value)
+.toLocaleString(
+"en-ZA",
+{
+day:"2-digit",
+month:"short",
+year:"numeric",
+hour:"2-digit",
+minute:"2-digit"
+}
+);
+
+}
+
+
+function showCompletionTime(
+id,
+value
+){
+
+const element =
+document.getElementById(
+"completed-time-"+id
+);
+
+if(!element)
+return;
+
+element.style.display =
+"block";
+
+element.innerHTML =
+`✅ Cleaning Completed<br><strong>${formatDateTime(value)}</strong>`;
+
+}
+
+
+/* ==========================================
+   STATUS HELPERS
+========================================== */
+
+function prettyStatus(
+status
+){
+
+if(
+status==="in_progress"
+)
+return "In Progress";
+
+if(
+status==="completed"
+)
+return "Completed";
+
+return "Pending";
+
+}
+
+
+function statusClass(
+status
+){
+
+if(
+status==="in_progress"
+)
+return "progress";
+
+if(
+status==="completed"
+)
+return "completed";
+
+return "pending";
+
+}
+
+
+/* ==========================================
+   SECURITY
+========================================== */
+
+function escapeHTML(
+value
+){
+
+if(!value)
+return "";
+
+return String(
+value
+)
+.replaceAll(
+"&",
+"&amp;"
+)
+.replaceAll(
+"<",
+"&lt;"
+)
+.replaceAll(
+">",
+"&gt;"
+)
+.replaceAll(
+'"',
+"&quot;"
+)
+.replaceAll(
+"'",
+"&#039;"
+);
+
+}
+
+
+/* ==========================================
+   START
+========================================== */
+
+loadBookings();
+
+</script>
+
+</body>
+</html>
