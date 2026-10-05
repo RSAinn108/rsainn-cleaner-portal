@@ -14,6 +14,39 @@
     box-sizing: border-box;
 }
 
+
+.access-gate {
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    background:#f4f7f6;
+}
+.access-card {
+    width:min(460px,100%);
+    background:white;
+    border-radius:18px;
+    padding:30px 24px;
+    text-align:center;
+    box-shadow:0 8px 30px rgba(0,0,0,.10);
+}
+.access-card h1 {
+    margin:0 0 8px;
+    color:#064e3b;
+}
+.access-card p {
+    color:#64748b;
+    line-height:1.6;
+}
+.access-lock {
+    font-size:42px;
+    margin-bottom:10px;
+}
+.portal-hidden {
+    display:none !important;
+}
+
 body {
     margin: 0;
     font-family: Arial, Helvetica, sans-serif;
@@ -384,6 +417,17 @@ textarea {
 </head>
 
 <body>
+
+<div id="accessGate" class="access-gate">
+  <div class="access-card">
+    <div class="access-lock">🔒</div>
+    <h1>RSAinn Cleaner Portal</h1>
+    <p id="accessMessage">Checking your secure access link...</p>
+  </div>
+</div>
+
+<div id="portalContent" class="portal-hidden">
+
 
 <header>
 <div class="header-inner">
@@ -2134,9 +2178,112 @@ value
    START
 ========================================== */
 
-loadBookings();
+async function validatePortalAccess(){
+
+const gate =
+document.getElementById("accessGate");
+
+const message =
+document.getElementById("accessMessage");
+
+const portal =
+document.getElementById("portalContent");
+
+const params =
+new URLSearchParams(
+window.location.search
+);
+
+let token =
+params.get("access");
+
+if(token){
+
+sessionStorage.setItem(
+"rsainn_cleaner_access",
+token
+);
+
+/* Remove the token from the visible address bar after capture.
+   This prevents someone casually copying the open portal URL
+   and accidentally sharing the access token. */
+window.history.replaceState(
+{},
+document.title,
+window.location.pathname
+);
+
+} else {
+
+token =
+sessionStorage.getItem(
+"rsainn_cleaner_access"
+);
+
+}
+
+if(!token){
+
+message.innerHTML =
+"<strong>Access denied.</strong><br>This portal requires a valid RSAinn cleaner access link.";
+
+return;
+
+}
+
+try {
+
+const {data,error} =
+await db.rpc(
+"validate_cleaner_access",
+{
+access_token:token
+}
+);
+
+if(error)
+throw error;
+
+if(data !== true){
+
+sessionStorage.removeItem(
+"rsainn_cleaner_access"
+);
+
+message.innerHTML =
+"<strong>Access expired or revoked.</strong><br>Please request a new RSAinn cleaner access link.";
+
+return;
+
+}
+
+gate.style.display =
+"none";
+
+portal.classList.remove(
+"portal-hidden"
+);
+
+await loadBookings();
+
+}
+
+catch(error){
+
+console.error(error);
+
+message.innerHTML =
+"<strong>Unable to verify access.</strong><br>Please check your internet connection and try the original RSAinn access link again.";
+
+}
+
+}
+
+validatePortalAccess();
 
 </script>
+
+</div>
 
 </body>
 </html>
